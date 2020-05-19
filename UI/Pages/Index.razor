@@ -1,0 +1,33 @@
+﻿@page "/"
+@using Contracts
+@inject IGameManager GameManager
+
+<table>
+
+    <thead>
+        <tr><td>Game ID</td><td>Game Type</td><td></td></tr>
+    </thead>
+    <tbody>
+        @foreach (var game in games)
+        {
+            <tr>
+                <td><NavLink href=@($"Game/{game.GameId}")>@game.GameId</NavLink></td>
+                <td>@game.GameType</td>
+                <td>@game.Yellow?.Name vs @game.Red?.Name</td>
+
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+
+@code
+{
+    readonly List<Contracts.GameDto> games = new List<Contracts.GameDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        games.AddRange(await GameManager.ListGames());
+    }
+}

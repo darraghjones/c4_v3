@@ -1,0 +1,76 @@
+﻿@using Contracts
+@using Microsoft.ServiceFabric.Actors.Client
+@inject Func<Guid, IGameActor> GameActorFactory
+@implements Contracts.IGameActorEvents
+
+<h3>Game</h3>
+
+
+<div class="board">
+    @for (int j = 0; j < 7; j++)
+    {
+        <div class="column">
+            @for (int i = 5; i >= 0; i--)
+            {
+                int x = j;
+                int y = i;
+                <div class="gamepiece
+                     @Color(y,x)" @onclick="@(() => PieceClicked(x))"></div>
+            }
+        </div>
+    }
+</div>
+
+<p>Lasted updated at @GameState?.LastUpdated on Host @GameState?.Host</p>
+
+
+@code {
+
+    [Parameter]
+    public string GameId { get; set; }
+
+    private GameStateDto GameState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        proxy = GameActorFactory(Guid.Parse(GameId));
+        await proxy.SubscribeAsync<IGameActorEvents>(this);
+
+
+        GameState = await proxy.GetState();
+
+    }
+
+    public void GameStateChanged(GameStateDto gameState)
+    {
+        GameState = gameState;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task PieceClicked(int i)
+    {
+        await proxy.MakeMove(i);
+    }
+
+    private IGameActor proxy;
+
+    private string Color(int row, int col)
+    {
+        var winning = "";
+
+        if (GameState?.WinningGrid?[row][col] != 0)
+        {
+            winning = " winning";
+        }
+        
+        switch (GameState?.Board?[row][col])
+        {
+            case 1:
+                return $"red {winning}";
+            case 2:
+                return $"yellow {winning}";
+            default:
+                return $"blank";
+        }
+    }
+}

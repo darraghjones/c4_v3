@@ -1,0 +1,31 @@
+﻿@page "/TwoPlayer/{GameId}"
+@using Contracts
+@inject IGameManager GameManager
+<h3>TwoPlayer</h3>
+
+<GameBoard GameId="@GameId" />
+
+
+@code {
+
+    [Parameter]
+    public string GameId { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+
+        await GameManager.StartTwoPlayerGame(new GameDto
+        {
+            GameId = Guid.Parse(GameId),
+            Yellow = new PlayerDto { Name = "Yellow Player" },
+            Red = new PlayerDto { Name = "Red Player" }
+        });
+
+    }
+
+}

@@ -1,0 +1,34 @@
+﻿@page "/SinglePlayer/{GameId}"
+@using Contracts
+@attribute [Authorize]
+@inject IGameManager GameManager
+
+<h3>SinglePlayer</h3>
+
+
+<GameBoard GameId="@GameId" />
+
+
+
+
+@code {
+
+    [Parameter]
+    public string GameId { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+
+        await GameManager.StartSinglePlayerGame(new GameDto { 
+            GameId = Guid.Parse(GameId),
+            Yellow = new PlayerDto { Name = user.Identity.Name }
+        });
+
+    }
+
+}
