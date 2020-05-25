@@ -1,6 +1,7 @@
 ﻿@using Contracts
 @using Microsoft.ServiceFabric.Actors.Client
 @inject Func<Guid, IGameActor> GameActorFactory
+@inject IJSRuntime JSRuntime;
 @implements Contracts.IGameActorEvents
 
 <h3>Game</h3>
@@ -23,6 +24,24 @@
 
 <p>Lasted updated at @GameState?.LastUpdated on Host @GameState?.Host</p>
 
+
+<div>
+    <audio hidden="hidden" id="draw">
+        <source src="/sounds/draw.wav" />
+    </audio>
+    <audio hidden="hidden" id="hit">
+        <source src="/sounds/hit.wav" />
+    </audio>
+    <audio hidden="hidden" id="lose">
+        <source src="/sounds/lose.wav" />
+    </audio>
+    <audio hidden="hidden" id="think">
+        <source src="/sounds/think.wav" />
+    </audio>
+    <audio hidden="hidden" id="win">
+        <source src="/sounds/win.wav" />
+    </audio>
+</div>
 
 @code {
 
@@ -50,6 +69,12 @@
     private async Task PieceClicked(int i)
     {
         await proxy.MakeMove(i);
+        await PlaySound("hit");
+    }
+
+    private async Task PlaySound(string sound)
+    {
+        await JSRuntime.InvokeAsync<string>("PlaySound", new[] { sound });
     }
 
     private IGameActor proxy;
@@ -62,7 +87,7 @@
         {
             winning = " winning";
         }
-        
+
         switch (GameState?.Board?[row][col])
         {
             case 1:

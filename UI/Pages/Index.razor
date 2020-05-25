@@ -11,7 +11,7 @@
         @foreach (var game in games)
         {
             <tr>
-                <td><NavLink href=@($"Game/{game.GameId}")>@game.GameId</NavLink></td>
+                <td><NavLink href=@GetUrl(game)>@game.GameId</NavLink></td>
                 <td>@game.GameType</td>
                 <td>@game.Yellow?.Name vs @game.Red?.Name</td>
 
@@ -29,5 +29,18 @@
     protected override async Task OnInitializedAsync()
     {
         games.AddRange(await GameManager.ListGames());
+    }
+
+    private string GetUrl(GameDto game)
+    {
+        switch (game.GameType)
+        {
+            case GameTypeDto.SinglePlayer:
+                return $"SinglePlayer/{game.GameId}";
+            case GameTypeDto.TwoPlayer:
+                return $"TwoPlayer/{game.GameId}";
+            default:
+                return "";
+        }
     }
 }

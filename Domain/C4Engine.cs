@@ -27,14 +27,14 @@ namespace Domain
 
         private C4Engine Copy()
         {
-            return new C4Engine(board, score, numPieces);
+            return new C4Engine(board.DeepClone(), score.DeepClone(), numPieces);
         }
 
         public C4Engine(int[][] board, int[][] score, int numPieces)
         {
             this.numPieces = numPieces;
-            this.board = board.DeepClone();
-            this.score = score.DeepClone();
+            this.board = board;
+            this.score = score;
         }
 
         static C4Engine()

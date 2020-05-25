@@ -23,6 +23,7 @@ namespace GameActor
             this.gameManager = gameManager;
         }
 
+
         protected override async Task OnActivateAsync()
         {
             ActorEventSource.Current.ActorMessage(this, "Actor activated.");
